@@ -1,0 +1,38 @@
+services:
+  postgresql:
+    image: bitnami/postgresql:latest
+    container_name: manga-ink-postgres
+    environment:
+      POSTGRESQL_USERNAME: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRESQL_DATABASE: ${POSTGRES_DB}
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    volumes:
+      - postgresql_data:/bitnami/postgresql
+    networks:
+      - manga-ink-network
+
+  manga-ink-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: manga-ink-api
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - postgresql
+    networks:
+      - manga-ink-network
+
+volumes:
+  postgresql_data:
+
+networks:
+  manga-ink-network:
+    driver: bridge
