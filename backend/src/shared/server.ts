@@ -1,26 +1,83 @@
-import express from 'express'
-import swaggerUi from 'swagger-ui-express'
-import { swaggerSpec } from './docs/swagger'
+import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import jwt from '@fastify/jwt'
+import cookie from '@fastify/cookie'
+import swagger from '@fastify/swagger'
+import swaggerUi from '@fastify/swagger-ui'
+import { env } from './config/env'
 import { healthRoutes } from '../modules/health/health.routes'
+import { authRoutes } from '../modules/auth/auth.routes'
 
-export function createServer() {
-  const app = express()
+export async function createServer() {
+  const app = Fastify()
 
-  // Middleware para parsing de JSON
-  app.use(express.json())
+  await app.register(cors, {
+    origin: true,
+    credentials: true,
+  })
 
-  // Documentação Swagger
-  app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
-      customSiteTitle: 'API Manga-Ink - Documentação',
-      customCss: '.swagger-ui .topbar { display: none }',
-    }),
-  )
+  await app.register(cookie, {
+    secret: env.JWT_SECRET,
+  })
 
-  // Rotas da aplicação
-  app.use(healthRoutes)
+  await app.register(jwt, {
+    secret: env.JWT_SECRET,
+    cookie: {
+      cookieName: 'token',
+      signed: true,
+    },
+  })
+
+  await app.register(swagger, {
+    openapi: {
+      info: {
+        title: 'API Manga-Ink',
+        version: '1.0.0',
+        description:
+          'API do sistema Manga-Ink para gerenciamento de mangás, autores e coleções.',
+        contact: {
+          name: 'Equipe Manga-Ink',
+        },
+      },
+      servers: [
+        {
+          url: `http://localhost:${env.PORT}`,
+          description: 'Servidor local de desenvolvimento',
+        },
+      ],
+      tags: [
+        {
+          name: 'Health',
+          description: 'Endpoints para verificação do estado da aplicação',
+        },
+        {
+          name: 'Auth',
+          description: 'Endpoints de autenticação',
+        },
+      ],
+    },
+  })
+
+  await app.register(swaggerUi, {
+    routePrefix: '/api-docs',
+    uiConfig: {
+      docExpansion: 'list',
+      deepLinking: false,
+    },
+    staticCSP: true,
+  })
+
+  app.setNotFoundHandler((_request, reply) => {
+    reply.code(404).send({ error: 'Not Found' })
+  })
+
+  app.setErrorHandler((error, _request, reply) => {
+    app.log.error(error)
+    reply.code(500).send({ error: 'Internal Server Error' })
+  })
+
+  await app.register(healthRoutes)
+  await app.register(authRoutes)
 
   return app
 }

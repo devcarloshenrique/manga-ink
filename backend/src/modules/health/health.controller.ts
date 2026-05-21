@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 
-export function healthCheck(_req: Request, res: Response) {
-  res.json({
+export async function healthCheck(_request: FastifyRequest, reply: FastifyReply) {
+  return reply.send({
     status: 'ok',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
