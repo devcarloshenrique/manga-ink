@@ -1,10 +1,17 @@
 import type { FastifyInstance } from 'fastify'
-import { register, login } from './auth.controller'
+import { register } from './controllers/register.controller'
+import { login } from './controllers/login.controller'
+import { validateBody } from '../../shared/middlewares/validate-body'
+import { registerSchema } from './dtos/register.dto'
+import { loginSchema } from './dtos/login.dto'
+import type { RegisterDTO } from './dtos/register.dto'
+import type { LoginDTO } from './dtos/login.dto'
 
 export async function authRoutes(app: FastifyInstance) {
-  app.post(
+  app.post<{ Body: RegisterDTO }>(
     '/auth/register',
     {
+      preHandler: validateBody(registerSchema),
       schema: {
         tags: ['Auth'],
         summary: 'Cadastra um novo usuário',
@@ -51,9 +58,10 @@ export async function authRoutes(app: FastifyInstance) {
     register,
   )
 
-  app.post(
+  app.post<{ Body: LoginDTO }>(
     '/auth/login',
     {
+      preHandler: validateBody(loginSchema),
       schema: {
         tags: ['Auth'],
         summary: 'Login com email e senha',
