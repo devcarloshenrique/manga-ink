@@ -1,7 +1,5 @@
+import 'dotenv/config'
 import { z } from 'zod'
-
-// Carrega o arquivo .env usando a API nativa do Node.js 21+
-process.loadEnvFile()
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['dev', 'test', 'production']).default('dev'),

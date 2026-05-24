@@ -1,99 +1,59 @@
-import type { FastifyInstance } from 'fastify'
+import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
+import { z } from 'zod'
 import { register } from './controllers/register.controller'
 import { login } from './controllers/login.controller'
-import { validateBody } from '../../shared/middlewares/validate-body'
-import { registerSchema } from './dtos/register.dto'
+import { registerBodySchema } from './dtos/register.dto'
 import { loginSchema } from './dtos/login.dto'
-import type { RegisterDTO } from './dtos/register.dto'
-import type { LoginDTO } from './dtos/login.dto'
 
-export async function authRoutes(app: FastifyInstance) {
-  app.post<{ Body: RegisterDTO }>(
+export const authRoutes: FastifyPluginAsyncZod = async (app) => {
+  app.post(
     '/auth/register',
     {
-      preHandler: validateBody(registerSchema),
       schema: {
         tags: ['Auth'],
         summary: 'Cadastra um novo usuário',
-        body: {
-          type: 'object',
-          required: ['username', 'email', 'password', 'confirmPassword'],
-          properties: {
-            username: { type: 'string' },
-            email: { type: 'string', format: 'email' },
-            password: { type: 'string', minLength: 6 },
-            confirmPassword: { type: 'string', minLength: 6 },
-          },
-        },
+        body: registerBodySchema,
         response: {
-          201: {
-            type: 'object',
-            properties: {
-              user: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  username: { type: 'string' },
-                  email: { type: 'string' },
-                },
-              },
-              token: { type: 'string' },
-            },
-          },
-          400: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' },
-            },
-          },
-          409: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' },
-            },
-          },
+          201: z.object({
+            user: z.object({
+              id: z.string(),
+              username: z.string(),
+              email: z.string(),
+            }),
+            token: z.string(),
+          }),
+          400: z.object({
+            error: z.string(),
+            issues: z.any().optional(),
+          }),
+          409: z.object({
+            error: z.string(),
+          }),
         },
       },
     },
     register,
   )
 
-  app.post<{ Body: LoginDTO }>(
+  app.post(
     '/auth/login',
     {
-      preHandler: validateBody(loginSchema),
       schema: {
         tags: ['Auth'],
         summary: 'Login com email e senha',
-        body: {
-          type: 'object',
-          required: ['email', 'password'],
-          properties: {
-            email: { type: 'string', format: 'email' },
-            password: { type: 'string' },
-          },
-        },
+        body: loginSchema,
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              user: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string' },
-                  username: { type: 'string' },
-                  email: { type: 'string' },
-                },
-              },
-              token: { type: 'string' },
-            },
-          },
-          401: {
-            type: 'object',
-            properties: {
-              error: { type: 'string' },
-            },
-          },
+          200: z.object({
+            user: z.object({
+              id: z.string(),
+              username: z.string(),
+              email: z.string(),
+            }),
+            token: z.string(),
+          }),
+          401: z.object({
+            error: z.string(),
+          }),
         },
       },
     },

@@ -10,7 +10,9 @@ COPY package*.json ./
 RUN npm ci
 
 COPY prisma ./prisma
-RUN npx prisma generate
+COPY prisma.config.ts ./
+ARG DATABASE_URL
+RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
 COPY tsconfig.json ./
 COPY src ./src
@@ -28,7 +30,9 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY prisma ./prisma
-RUN npx prisma generate
+COPY prisma.config.ts ./
+ARG DATABASE_URL
+RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/modules ./src/modules
@@ -36,4 +40,4 @@ COPY .env ./
 
 EXPOSE 3333
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]

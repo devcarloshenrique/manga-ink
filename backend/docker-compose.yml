@@ -13,6 +13,11 @@ services:
       - '${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgresql_data:/bitnami/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h 127.0.0.1 -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - manga-ink-network
 
@@ -20,6 +25,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}?schema=public
     container_name: manga-ink-api
     environment:
       NODE_ENV: ${NODE_ENV}
@@ -29,7 +36,8 @@ services:
     ports:
       - '${PORT}:${PORT}'
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
     networks:
       - manga-ink-network
 
