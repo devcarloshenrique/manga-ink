@@ -2,6 +2,8 @@ services:
   postgresql:
     image: bitnami/postgresql:latest
     container_name: manga-ink-postgres
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -10,7 +12,7 @@ services:
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRESQL_DATABASE: ${POSTGRES_DB}
     ports:
-      - '${POSTGRES_PORT:-5432}:5432'
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgresql_data:/bitnami/postgresql
     healthcheck:
@@ -28,13 +30,15 @@ services:
       args:
         - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}?schema=public
     container_name: manga-ink-api
+    env_file:
+      - .env
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: ${PORT}
       JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}?schema=public
     ports:
-      - '${PORT}:${PORT}'
+      - "${PORT}:${PORT}"
     depends_on:
       postgresql:
         condition: service_healthy

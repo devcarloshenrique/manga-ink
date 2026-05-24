@@ -36,8 +36,7 @@ RUN DATABASE_URL=${DATABASE_URL} npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/modules ./src/modules
-COPY .env ./
 
 EXPOSE 3333
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/app.js"]
