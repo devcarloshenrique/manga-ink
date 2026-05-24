@@ -16,6 +16,12 @@ export class PrismaUserRepository implements UserRepository {
     })
   }
 
+  async findById(id: string) {
+    return prisma.user.findUnique({
+      where: { id },
+    })
+  }
+
   async create(data: CreateUserInput) {
     return prisma.user.create({
       data,

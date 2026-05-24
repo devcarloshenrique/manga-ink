@@ -9,5 +9,6 @@ export type CreateUserInput = {
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>
   findByEmailOrUsername(email: string, username: string): Promise<User | null>
+  findById(id: string): Promise<User | null>
   create(data: CreateUserInput): Promise<User>
 }

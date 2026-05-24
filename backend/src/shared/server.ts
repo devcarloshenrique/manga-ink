@@ -61,6 +61,15 @@ export async function createServer() {
           description: 'Endpoints de autenticação',
         },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+        },
+      },
     },
     transform: jsonSchemaTransform,
   })
