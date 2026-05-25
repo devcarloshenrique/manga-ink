@@ -9,3 +9,15 @@ export class InvalidCredentialsError extends Error {
     super('Credenciais inválidas')
   }
 }
+
+export class EmailAlreadyInUseError extends Error {
+  constructor() {
+    super('E-mail já está em uso por outra conta')
+  }
+}
+
+export class UsernameAlreadyInUseError extends Error {
+  constructor() {
+    super('Nome de usuário já está em uso')
+  }
+}

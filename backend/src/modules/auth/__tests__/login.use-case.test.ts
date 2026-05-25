@@ -11,9 +11,11 @@ import type { TokenService } from '../services/token.service'
 const makeSut = () => {
   const userRepository: UserRepository = {
     findByEmail: vi.fn(),
+    findByUsername: vi.fn(),
     findByEmailOrUsername: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
   }
 
   const hasher: PasswordHasher = {
@@ -62,6 +64,8 @@ describe('LoginUserUseCase', () => {
       username: 'joao',
       email: 'joao@email.com',
       passwordHash: 'hashed',
+      kindleEmail: null,
+      avatarUrl: null,
     })
     // Mock: senha fornecida NÃO corresponde ao hash salvo
     vi.mocked(hasher.compare).mockResolvedValue(false)
@@ -85,6 +89,8 @@ describe('LoginUserUseCase', () => {
       username: 'joao',
       email: 'joao@email.com',
       passwordHash: 'hashed',
+      kindleEmail: null,
+      avatarUrl: null,
     })
     // Mock: senha fornecida corresponde ao hash salvo
     vi.mocked(hasher.compare).mockResolvedValue(true)
@@ -110,6 +116,8 @@ describe('LoginUserUseCase', () => {
         id: 'user-1',
         username: 'joao',
         email: 'joao@email.com',
+        kindleEmail: null,
+        avatarUrl: null,
       },
       token: 'token-123',
     })

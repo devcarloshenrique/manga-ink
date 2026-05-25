@@ -10,9 +10,11 @@ import type { TokenService } from '../services/token.service'
 const makeSut = () => {
   const userRepository: UserRepository = {
     findByEmail: vi.fn(),
+    findByUsername: vi.fn(),
     findByEmailOrUsername: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
   }
 
   const hasher: PasswordHasher = {
@@ -41,6 +43,8 @@ describe('RegisterUserUseCase', () => {
       username: 'joao',
       email: 'joao@email.com',
       passwordHash: 'hash',
+      kindleEmail: null,
+      avatarUrl: null,
     })
 
     await expect(
@@ -68,6 +72,8 @@ describe('RegisterUserUseCase', () => {
       username: 'joao',
       email: 'joao@email.com',
       passwordHash: 'hashed',
+      kindleEmail: null,
+      avatarUrl: null,
     })
     // Mock: token service gerou o JWT
     vi.mocked(tokenService.sign).mockResolvedValue('token-123')
@@ -103,6 +109,8 @@ describe('RegisterUserUseCase', () => {
         id: 'user-1',
         username: 'joao',
         email: 'joao@email.com',
+        kindleEmail: null,
+        avatarUrl: null,
       },
       token: 'token-123',
     })

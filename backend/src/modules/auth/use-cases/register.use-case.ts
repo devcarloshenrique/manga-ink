@@ -37,6 +37,8 @@ export class RegisterUserUseCase {
         id: user.id,
         username: user.username,
         email: user.email,
+        kindleEmail: user.kindleEmail,
+        avatarUrl: user.avatarUrl,
       },
       token,
     }

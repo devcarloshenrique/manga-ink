@@ -9,9 +9,11 @@ import type { UserRepository } from '../../user/repositories/user.repository'
 const makeSut = () => {
   const userRepository: UserRepository = {
     findByEmail: vi.fn(),
+    findByUsername: vi.fn(),
     findByEmailOrUsername: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
   }
 
   const sut = new GetMeUseCase(userRepository)
@@ -44,6 +46,8 @@ describe('GetMeUseCase', () => {
       username: 'joao',
       email: 'joao@email.com',
       passwordHash: 'hashed',
+      kindleEmail: null,
+      avatarUrl: null,
     })
 
     const result = await sut.execute('user-1')
@@ -55,6 +59,8 @@ describe('GetMeUseCase', () => {
       id: 'user-1',
       username: 'joao',
       email: 'joao@email.com',
+      kindleEmail: null,
+      avatarUrl: null,
     })
   })
 })
